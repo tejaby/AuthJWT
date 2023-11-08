@@ -1,5 +1,11 @@
+# cache
+__pycache__/
+
+# database
 *.sqlite3
-__pycache__
+
+# migrations
+**/migrations/
 
 # virtual environment
 virtualenv/
