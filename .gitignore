@@ -1,0 +1,9 @@
+*.sqlite3
+__pycache__
+
+# virtual environment
+virtualenv/
+
+# media
+media/
+static/
