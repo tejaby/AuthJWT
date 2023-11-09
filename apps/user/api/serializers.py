@@ -28,6 +28,14 @@ class UserListSerializer(serializers.ModelSerializer):
         }
 
 
+"""
+Serializador para el listado de usuarios con datos relacionados al modelo CustomUser.
+
+Este serializador se utiliza para representar los datos de usuarios con detalles específicos del modelo CustomUser.
+
+"""
+
+
 class CustomUserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -45,6 +53,42 @@ class CustomUserListSerializer(serializers.ModelSerializer):
             "profile_picture": instance.profile_picture.url if instance.profile_picture else None,
             "birthdate": instance.birthdate,
         }
+
+
+"""
+Otra forma del Serializador para el listado de usuarios con datos relacionados al modelo CustomUser.
+
+para acceder a los campos de customuser en CustomUserRelatedSerializer se anida el  serializador de CustomUser
+
+"""
+
+
+# Se crea un serializador para CustomUser que muestre los campos que deseas
+
+class CustomUserRelatedSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['biography', 'website', 'profile_picture', 'birthdate']
+
+
+# Se agrega un campo custom_user en el serializador UserListSerializer que utiliza el serializaor CustomUserSerializer y usa source='customuser' para indicar que se debe obtener la información de CustomUser a través del campo customuser de User.
+
+class UserRelatedListSerializer(serializers.ModelSerializer):
+    custom_user = CustomUserRelatedSerializer(source='customuser')
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email',
+                  'first_name', 'last_name', 'custom_user']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Extraemos los datos del campo custom_user del diccionario data utilizando el método pop.
+        custom_user_data = data.pop('custom_user')
+        if custom_user_data is not None:
+            # Agregamos los datos de custom_user_data al diccionario data, lo que incluye todos los campos de custom_user.
+            data.update(custom_user_data)
+        return data
 
 
 """
