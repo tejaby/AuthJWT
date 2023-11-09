@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from django.contrib.auth.models import User
+from apps.user.models import CustomUser
 
 
 """
@@ -24,6 +25,25 @@ class UserListSerializer(serializers.ModelSerializer):
             "correo electrónico": instance.email,
             "nombres": instance.first_name,
             "apellidos": instance.last_name
+        }
+
+
+class CustomUserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        exclude = ('id')
+
+    def to_representation(self, instance):
+        return {
+            "id": instance.user.id,
+            "nombre de usuario": instance.user.username,
+            "correo electrónico": instance.user.email,
+            "nombres": instance.user.first_name,
+            "apellidos": instance.user.last_name,
+            "biography": instance.biography,
+            "website": instance.website,
+            "profile_picture": instance.profile_picture.url if instance.profile_picture else None,
+            "birthdate": instance.birthdate,
         }
 
 

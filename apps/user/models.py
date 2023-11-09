@@ -13,6 +13,7 @@ el atributo auto_now_add establecera fecha y hora actual al crear el objeto, per
 
 
 class CustomUser(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     biography = models.CharField(max_length=150, blank=True, null=True)
     website = models.CharField(max_length=150, blank=True, null=True)
@@ -27,7 +28,6 @@ class CustomUser(models.Model):
 
     def __str__(self):
         return self.user.username
-
 
 
 # Acceder al usuario desde un objeto CustomUser
