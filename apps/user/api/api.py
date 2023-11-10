@@ -92,3 +92,16 @@ class UserViewSet(GenericViewSet):
         serializer = self.get_serializer(user)
 
         return Response({"message": "customuser created successfully", "user": serializer.data}, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance is not None:
+            instance.is_active = False
+            instance.save()
+            return Response({'message': 'user deleted successfully'}, status=status.HTTP_200_OK)
+        return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
