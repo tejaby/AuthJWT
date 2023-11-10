@@ -121,3 +121,27 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
+
+
+"""
+Serializador para la actualizacion de usuarios del modelo User.
+
+"""
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+
+
+"""
+Serializador para la actualizacion de usuarios del modelo CustomUser.
+
+"""
+
+
+class CustomUserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['biography', 'website', 'birthdate', 'profile_picture']

@@ -9,6 +9,9 @@ from .serializers import UserRelatedListSerializer
 # serializadores para la creacion de usuarios
 from .serializers import UserSerializer, CustomUserSerializer
 
+# serializadores para la actualizacion de usuarios
+from .serializers import UserUpdateSerializer, CustomUserUpdateSerializer
+
 # from .serializers import UserListSerializer1
 
 
@@ -75,8 +78,8 @@ class UserViewSet(GenericViewSet):
     def create(self, request, *args, **kwargs):
         # Crea un nuevo objeto CustomUser junto con un objeto User relacionado. Requiere datos para ambos objetos en user_data y custom_user_data respectivamente
 
-        user_data = request.data.get('user', {})
-        custom_user_data = request.data.get('customuser', {})
+        user_data = request.data.get('user_data', {})
+        custom_user_data = request.data.get('custom_user_data', {})
 
         user_serializer = UserSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
@@ -105,3 +108,27 @@ class UserViewSet(GenericViewSet):
             instance.save()
             return Response({'message': 'user deleted successfully'}, status=status.HTTP_200_OK)
         return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    def update(self, request, *args, **kwargs):
+
+        # Actualiza un objeto User junto con su objeto CustomUser relacionado. Requiere datos actualizados para ambos objetos en 'user_data' y 'custom_user_data' respectivamente.
+
+        instance = self.get_object()
+        user_data = request.data.get('user_data', {})
+        custom_user_data = request.data.get('custom_user_data', {})
+
+        user_serializer = UserUpdateSerializer(
+            instance, data=user_data, partial=True)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+        # Accede al objeto CustomUser relacionado
+        customuser_instance = instance.customuser
+        customuser_serializer = CustomUserUpdateSerializer(
+            customuser_instance, data=custom_user_data, partial=True)
+        customuser_serializer.is_valid(raise_exception=True)
+        customuser = customuser_serializer.save()
+
+        serializer = self.get_serializer(user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
