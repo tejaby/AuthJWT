@@ -94,7 +94,6 @@ class UserRelatedListSerializer(serializers.ModelSerializer):
 """
 Serializador para la creacion de usuarios.
 
-se utiliza para crear nuevos usuarios en la API
 Se sobrescribe el método create para encriptar la contraseña utilizando el método set_password
 
 """
@@ -110,3 +109,15 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data.get('password'))
         user.save()
         return user
+
+
+"""
+Serializador para la creacion de usuarios del modelo CustomUser.
+
+"""
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
