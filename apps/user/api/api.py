@@ -40,17 +40,55 @@ class UserViewSet(GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def create(self, request, *args, **kwargs):
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        serializer_user = self.get_serializer(user)
-        return Response({'message': 'user created successfully', 'user': serializer_user.data}, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = UserSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     user = serializer.save()
+    #     serializer_user = self.get_serializer(user)
+    #     return Response({'message': 'user created successfully', 'user': serializer_user.data}, status=status.HTTP_201_CREATED)
 
-    @action(methods=['POST'], detail=False)
-    def create_customuser(self, request, *args, **kwargs):
-        serializer = CustomUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        customuser = serializer.save()
-        customuser_serializer = CustomUserListSerializer(customuser)
-        return Response({'message': 'customuser created successfully', 'customuser': customuser_serializer.data}, status=status.HTTP_201_CREATED)
+    # @action(methods=['POST'], detail=False)
+    # def create_customuser(self, request, *args, **kwargs):
+    #     serializer = CustomUserSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     customuser = serializer.save()
+    #     customuser_serializer = CustomUserListSerializer(customuser)
+    #     return Response({'message': 'customuser created successfully', 'customuser': customuser_serializer.data}, status=status.HTTP_201_CREATED)
+
+    # def create(self, request, *args, **kwargs):
+    #     user = request.data.get('user', {})
+    #     serializer = UserSerializer(data=user)
+    #     serializer.is_valid(raise_exception=True)
+    #     user = serializer.save()
+
+    #     customuser = request.data.get('customuser', {})
+    #     customuser['user'] = user.id
+    #     self.create_customuser(customuser)
+    #     custom_serializer = self.get_serializer(user)
+    #     return Response(custom_serializer.data, status=status.HTTP_201_CREATED)
+
+    # def create_customuser(self, data):
+    #     serializer = CustomUserSerializer(data=data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+
+    def create(self, request, *args, **kwargs):
+        # Crea un nuevo objeto CustomUser junto con un objeto User relacionado. Requiere datos para ambos objetos en user_data y custom_user_data respectivamente
+
+        user_data = request.data.get('user', {})
+        custom_user_data = request.data.get('customuser', {})
+
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+        custom_user_data['user'] = user.id
+
+        customuser_serializer = CustomUserSerializer(
+            data=custom_user_data)
+        customuser_serializer.is_valid(raise_exception=True)
+        custom_user = customuser_serializer.save()
+
+        serializer = self.get_serializer(user)
+
+        return Response({"message": "customuser created successfully", "user": serializer.data}, status=status.HTTP_200_OK)
