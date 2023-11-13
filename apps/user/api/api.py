@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -43,8 +45,8 @@ class UserViewSet(GenericViewSet):
         return self.model.objects.filter(is_active=True)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        queryset = CustomUser.objects.all()
+        serializer = CustomUserListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # def create(self, request, *args, **kwargs):
@@ -96,43 +98,44 @@ class UserViewSet(GenericViewSet):
         customuser_serializer.is_valid(raise_exception=True)
         custom_user = customuser_serializer.save()
 
-        serializer = self.get_serializer(user)
+        serializer = CustomUserListSerializer(custom_user)
 
         return Response({"message": "customuser created successfully", "user": serializer.data}, status=status.HTTP_200_OK)
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        # instance = CustomUser.objects.filter(pk=pk).first()
+        instance = get_object_or_404(CustomUser, pk=pk)
+        serializer = CustomUserListSerializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def destroy(self, request, pk=None, *args, **kwargs):
+        instance = get_object_or_404(CustomUser, pk=pk)
         if instance is not None:
-            instance.is_active = False
-            instance.save()
+            instance.user.is_active = False
+            instance.user.save()
             return Response({'message': 'user deleted successfully'}, status=status.HTTP_200_OK)
         return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, pk=None, *args, **kwargs):
 
         # Actualiza un objeto User junto con su objeto CustomUser relacionado. Requiere datos actualizados para ambos objetos en 'user_data' y 'custom_user_data' respectivamente.
 
-        instance = self.get_object()
+        instance = get_object_or_404(CustomUser, pk=pk)
         user_data = request.data.get('user_data', {})
         custom_user_data = request.data.get('custom_user_data', {})
 
         user_serializer = UserUpdateSerializer(
-            instance, data=user_data, partial=True)
+            instance.user, data=user_data, partial=True)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
 
         # Accede al objeto CustomUser relacionado
-        customuser_instance = instance.customuser
+        # customuser_instance = instance.customuser
         customuser_serializer = CustomUserUpdateSerializer(
-            customuser_instance, data=custom_user_data, partial=True)
+            instance, data=custom_user_data, partial=True)
         customuser_serializer.is_valid(raise_exception=True)
         customuser = customuser_serializer.save()
 
-        serializer = self.get_serializer(user)
+        serializer = CustomUserListSerializer(customuser)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

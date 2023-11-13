@@ -39,11 +39,11 @@ Este serializador se utiliza para representar los datos de usuarios con detalles
 class CustomUserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        exclude = ('id')
+        exclude = ['id']
 
     def to_representation(self, instance):
         return {
-            "id": instance.user.id,
+            "id": instance.id,
             "nombre de usuario": instance.user.username,
             "correo electrónico": instance.user.email,
             "nombres": instance.user.first_name,
@@ -132,7 +132,7 @@ Serializador para la actualizacion de usuarios del modelo User.
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name')
+        fields = ['username', 'email', 'first_name', 'last_name']
 
 
 """
