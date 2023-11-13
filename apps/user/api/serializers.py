@@ -48,10 +48,10 @@ class CustomUserListSerializer(serializers.ModelSerializer):
             "correo electrónico": instance.user.email,
             "nombres": instance.user.first_name,
             "apellidos": instance.user.last_name,
-            "biography": instance.biography,
-            "website": instance.website,
-            "profile_picture": instance.profile_picture.url if instance.profile_picture else None,
-            "birthdate": instance.birthdate,
+            "biography": instance.biography if instance.biography else '',
+            "website": instance.website if instance.website else '',
+            "profile_picture": instance.profile_picture.url if instance.profile_picture else '',
+            "birthdate": instance.birthdate if instance.birthdate else '',
         }
 
 
