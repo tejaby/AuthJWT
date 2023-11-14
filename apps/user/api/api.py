@@ -2,7 +2,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
-from rest_framework_simplejwt import authentication
 
 # serializadores para el listado y obtencion de usuarios
 from .serializers import UserListSerializer, CustomUserListSerializer

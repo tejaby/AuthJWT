@@ -1,4 +1,7 @@
+from django.contrib.auth import authenticate
+
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.contrib.auth.models import User
 from apps.user.models import CustomUser
@@ -31,7 +34,7 @@ class UserListSerializer(serializers.ModelSerializer):
 """
 Serializador para el listado de usuarios con datos relacionados al modelo CustomUser.
 
-Este serializador se utiliza para representar los datos de usuarios con detalles específicos del modelo CustomUser.
+Este serializador se utiliza para representar los datos de usuarios con detalles específicos del modelo CustomUser
 
 """
 
@@ -71,7 +74,7 @@ class CustomUserRelatedSerializer (serializers.ModelSerializer):
         fields = ['biography', 'website', 'profile_picture', 'birthdate']
 
 
-# Se agrega un campo custom_user en el serializador UserListSerializer que utiliza el serializaor CustomUserSerializer y usa source='customuser' para indicar que se debe obtener la información de CustomUser a través del campo customuser de User.
+# Se agrega un campo custom_user en el serializador UserListSerializer que utiliza el serializaor CustomUserSerializer y usa source='customuser' para indicar que se debe obtener la información de CustomUser a través del campo customuser de User
 
 class UserRelatedListSerializer(serializers.ModelSerializer):
     custom_user = CustomUserRelatedSerializer(source='customuser')
@@ -86,7 +89,7 @@ class UserRelatedListSerializer(serializers.ModelSerializer):
         # Extraemos los datos del campo custom_user del diccionario data utilizando el método pop.
         custom_user_data = data.pop('custom_user')
         if custom_user_data is not None:
-            # Agregamos los datos de custom_user_data al diccionario data, lo que incluye todos los campos de custom_user.
+            # Agregamos los datos de custom_user_data al diccionario data, lo que incluye todos los campos de custom_user
             data.update(custom_user_data)
         return data
 
@@ -145,3 +148,56 @@ class CustomUserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['biography', 'website', 'birthdate', 'profile_picture']
+
+
+"""
+Serializer para la autenticacion para el inicio de sesion.
+
+validate: Valida las credenciales del usuario y genera un token de acceso
+get_token: Genera tokens de actualización y acceso para el usuario autenticado
+
+- la clase RefreshToken se utiliza para crear tokens de actualización y valida los tokens existentes
+
+Crear un token de actualización para un usuario
+refresh = RefreshToken.for_user(user)
+
+Crear un nuevo token de acceso usando un token de actualización
+refresh = RefreshToken(token)
+new_access_token = str(refresh.access_token)
+
+
+"""
+
+
+class CustomTokenObtainPairSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        if username and password:
+            user = authenticate(request=self.context.get(
+                'request'), username=username, password=password)
+
+            if not user:
+                msg = 'No se encontró un usuario con estas credenciales.'
+                # Raises: serializers.ValidationError: Si las credenciales son inválidas o faltan.
+                raise serializers.ValidationError(
+                    {'error': msg}, code='authorization')
+        else:
+            msg = 'Debe proporcionar un username y una contraseña.'
+            raise serializers.ValidationError(msg, code='authorization')
+
+        data['token'] = self.get_token(user)
+        # Returns: dict: Datos validados con token de acceso.
+        return data
+
+    def get_token(self, user):
+        refresh = RefreshToken.for_user(user)
+        token = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
+        return token
