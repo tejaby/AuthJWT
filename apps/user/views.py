@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # serializadores para el listado y obtencion de usuarios
 from apps.user.api.serializers import CustomUserListSerializer
@@ -41,6 +41,18 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         user_serializer = CustomUserListSerializer(user.customuser)
 
         return Response({'message': 'inicio de sesión exitosamente', 'token': serializer.validated_data, 'user': user_serializer.data}, status=status.HTTP_200_OK)
+
+
+'''
+Vista basada en clase TokenRefreshView para la actualización de tokens de acceso.
+
+TokenRefreshView se encarga de aceptar tokens de refresco válidos y generar nuevos tokens de acceso si el token de refresco proporcionado es válido y no está vencido
+
+'''
+
+
+class CustomTokenRefreshView(TokenRefreshView):
+    pass
 
 
 '''
