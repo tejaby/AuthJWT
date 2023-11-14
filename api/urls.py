@@ -9,14 +9,15 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from apps.user.views import CustomTokenObtainPairView
+from apps.user.views import CustomTokenObtainPairView, CustomLogoutPairView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/', CustomTokenObtainPairView.as_view(), name='token'),
+    path('login/', CustomTokenObtainPairView.as_view(), name='token'),
+    path('logout/', CustomLogoutPairView.as_view(), name='logout'),
     path('', include('apps.user.urls')),
 ]
 
