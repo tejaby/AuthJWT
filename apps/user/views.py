@@ -28,13 +28,13 @@ Vista basada en clase TokenObtainPairView para la autenticacion de usuarios y cr
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         if not request.data.get('username') or not request.data.get('password'):
-            return Response({'errors': 'username and password are required'})
+            return Response({'errors': 'username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(request=request, username=request.data.get(
             'username'), password=request.data.get('password'))
 
         if user is None:
-            return Response({'errors': 'no se encontró ninguna cuenta activa con las credenciales proporcionadas'})
+            return Response({'errors': 'no se encontró ninguna cuenta activa con las credenciales proporcionadas'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -72,6 +72,6 @@ class CustomLogoutPairView(GenericAPIView):
             # Intenta revocar el token de refresco
             token = RefreshToken(refresh)
             token.blacklist()
-            return Response({"message": "cierre de sesión exitoso"}, status=status.HTTP_205_RESET_CONTENT)
+            return Response({"message": "cierre de sesión exitoso"}, status=status.HTTP_200_OK)
         except TokenError:
             return Response({"errors": "Token de refresco inválido"}, status=status.HTTP_400_BAD_REQUEST)
