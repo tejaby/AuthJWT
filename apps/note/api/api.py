@@ -17,6 +17,7 @@ class NoteListAPIView(ListAPIView):
         return self.model.objects.all()
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        user = request.user
+        queryset = user.note_set.all()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
