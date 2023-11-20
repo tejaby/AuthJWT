@@ -20,6 +20,7 @@ urlpatterns = [
     path('refresh/', CustomTokenRefreshView.as_view(), name='refresh'),
     path('logout/', CustomLogoutPairView.as_view(), name='logout'),
     path('', include('apps.user.urls')),
+    path('', include('apps.note.urls')),
 ]
 
 if settings.DEBUG:

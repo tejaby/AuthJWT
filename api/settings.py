@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'apps.base.apps.BaseConfig',
     'apps.user.apps.UserConfig',
+    'apps.note.apps.NoteConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
